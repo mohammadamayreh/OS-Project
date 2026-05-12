@@ -1,165 +1,239 @@
 # Priority Scheduling – Non-Preemptive
 
 **Student:** Mohammad  
-**Algorithm Type:** Non-Preemptive  
-**Scheduling Policy:** Process with highest priority executes first
+**Algorithm:** Priority Scheduling (Non-Preemptive)  
+**Course:** CS11335 Operating Systems – Princess Sumaya University
 
 ---
 
-## Algorithm Description
+## What is Priority Scheduling?
 
-Priority Scheduling is an algorithm where each process is assigned a priority, and the CPU is allocated to the process with the highest priority. In the non-preemptive version, once a process starts execution, it runs to completion even if a higher priority process arrives.
+Priority Scheduling is a CPU scheduling algorithm where each process is assigned a priority value.  
+The CPU chooses the process with the highest priority among the processes that have already arrived.
 
-### Characteristics
-- **Non-Preemptive:** Once a process starts, it cannot be interrupted
-- **Flexible:** Can assign priorities based on various criteria
-- **Priority Types:** 
-  - Higher number = higher priority (or vice versa, define your convention)
-  - Static or dynamic priorities
-- **Starvation:** Low-priority processes may starve if high-priority processes continuously arrive
-- **Real-world Use:** Widely used in real operating systems
-
----
-
-## Implementation Guidelines
-
-### Requirements
-1. Implement process queue and sorting mechanism by priority
-2. Track the following for each process:
-   - Process ID
-   - Arrival Time
-   - Burst Time (CPU execution time)
-   - Priority Level (define your scale, e.g., 1-10, where 1 is highest or lowest)
-   - Completion Time
-   - Turnaround Time = Completion Time - Arrival Time
-   - Waiting Time = Turnaround Time - Burst Time
-
-### Priority Convention
-**Define clearly:** Are higher numbers = higher priority or lower priority?
-Example: 1 (Highest Priority) to 10 (Lowest Priority)
-
-### Pseudocode
+In this implementation, the priority convention is:
 
 ```
-PriorityScheduling_NonPreemptive(processes):
-    scheduled = []
-    current_time = 0
-    remaining_processes = sort(processes, by arrival_time)
-    
-    while remaining_processes is not empty:
-        # Find processes that have arrived by current_time
-        available = [p for p in remaining_processes if p.arrival_time <= current_time]
-        
-        if available is empty and remaining_processes is not empty:
-            # No process has arrived yet, jump to next arrival
-            current_time = min(remaining_processes).arrival_time
-            continue
-        
-        # Select process with highest priority
-        next_process = max(available, by priority)  # Adjust based on your priority scheme
-        
-        current_time = max(current_time, next_process.arrival_time)
-        next_process.completion_time = current_time + next_process.burst_time
-        
-        calculate turnaround_time and waiting_time
-        add to scheduled
-        remove from remaining_processes
-        
-        current_time = next_process.completion_time
+1 = Highest Priority
+Larger number = Lower Priority
+```
+
+Since this version is non-preemptive, once a process starts executing, it cannot be interrupted. It continues running until it finishes, even if a higher-priority process arrives while it is running.
+
+---
+
+## Key Metrics
+
+| Metric           | Formula                              |
+|------------------|--------------------------------------|
+| Completion Time  | Time when the process finishes       |
+| Turnaround Time  | Completion Time − Arrival Time       |
+| Waiting Time     | Turnaround Time − Burst Time         |
+
+---
+
+## Code Structure
+
+```
+priority.cpp
+└── main()
+    ├── read input       → ask user for number of processes
+    │                       then arrival time, burst time, and priority for each process
+    ├── priority loop    → select the available process with the highest priority
+    │                       if priorities are equal, choose the earlier arrival time
+    │                       if no process has arrived, CPU time increases by 1
+    └── print results    → Gantt chart + process table + averages
 ```
 
 ---
 
-## Folder Structure
+## How to Compile & Run
 
-```
-mohammad/priority-scheduling/
-├── README.md                    # This file
-├── code/
-│   ├── priority.cpp            # C++ implementation
-│   ├── priority.py             # Python implementation (optional)
-│   └── input_processes.txt      # Test input file
-└── results/
-    ├── output.txt              # Algorithm output
-    └── metrics.txt             # Performance metrics
-```
+**Requires:** g++ compiler (MinGW on Windows, or g++ on Linux/macOS)
 
----
-
-## Running the Program
-
-### Prerequisites
-- [Your chosen language compiler/interpreter]
-- Standard C++ Library / Python 3.x
-
-### Compilation/Execution
-
-**For C++ (example):**
 ```bash
 cd mohammad/priority-scheduling/code
 g++ -o priority priority.cpp
-./priority input_processes.txt
+./priority          # Linux/macOS
+priority.exe        # Windows
 ```
 
-**For Python (example):**
-```bash
-cd mohammad/priority-scheduling/code
-python priority.py input_processes.txt
-```
+> No compiler installed? Paste the code into <https://www.onlinegdb.com/online_c++_compiler> and click **Run**.
 
 ---
 
-## Input Format
+## How to Use the Program
 
-Create `input_processes.txt` with the following format:
+When the program runs, it will prompt you step-by-step:
+
 ```
-Process_ID Arrival_Time Burst_Time Priority
-P1 0 5 2
-P2 1 3 5
-P3 2 8 1
-P4 3 6 3
-```
+Enter number of processes: 5
 
-*(Where 1 = Highest Priority, 5 = Lowest Priority — adjust your scale)*
+P1
+Arrival Time: 0
+Burst Time: 8
+Priority (1 = highest): 3
 
----
-
-## Output Format
-
-Your program should produce output in this format:
-```
-Process | Arrival Time | Burst Time | Priority | Completion Time | Turnaround Time | Waiting Time
-P3      | 2            | 8          | 1        | 10              | 8               | 0
-P1      | 0            | 5          | 2        | 5               | 5               | 0
+P2
+Arrival Time: 1
+Burst Time: 4
+Priority (1 = highest): 1
 ...
+```
 
-Average Turnaround Time: X.XX
-Average Waiting Time: X.XX
+Just type each number and press **Enter** after each one.
+
+---
+
+## Test Cases
+
+Below are the shared CPU scheduling test cases used by the group.  
+Each test case lists the values to type in order, one per line, and the expected output.
+
+---
+
+### Test Case 1 – General Mixed Case
+
+A balanced set of processes with staggered arrivals and mixed burst times.  
+This represents a typical real-world workload.
+
+**Input:**
+```
+5
+0
+8
+3
+1
+4
+1
+2
+9
+4
+3
+5
+2
+4
+2
+5
+```
+
+**Expected Output:**
+```
+Gantt Chart: P1 P2 P4 P3 P5
+
+Process Arrival Burst Priority Completion Waiting Turnaround
+P1      0       8     3        8          0       8
+P2      1       4     1        12         7       11
+P3      2       9     4        26         15      24
+P4      3       5     2        17         9       14
+P5      4       2     5        28         22      24
+
+Average Waiting Time = 10.6
+Average Turnaround Time = 16.2
 ```
 
 ---
 
-## Testing
+### Test Case 2 – Convoy Effect
 
-Create multiple test cases including:
-- Processes with different priorities
-- Test case showing starvation (low-priority process never executes)
-- Test case with inverted priorities (low-priority arrives first)
-- At least 5 comprehensive test cases
+One long process arrives first, followed by several short ones.  
+This highlights the weakness of non-preemptive algorithms because the first long process cannot be interrupted.
+
+**Input:**
+```
+4
+0
+20
+4
+1
+3
+2
+2
+3
+1
+3
+3
+3
+```
+
+**Expected Output:**
+```
+Gantt Chart: P1 P3 P2 P4
+
+Process Arrival Burst Priority Completion Waiting Turnaround
+P1      0       20    4        20         0       20
+P2      1       3     2        26         22      25
+P3      2       3     1        23         18      21
+P4      3       3     3        29         23      26
+
+Average Waiting Time = 15.75
+Average Turnaround Time = 23
+```
+
+---
+
+### Test Case 3 – CPU Idle Gaps
+
+Processes arrive with large gaps between them, causing the CPU to sit idle in between.  
+This shows how the algorithm handles waiting periods when no process is available.
+
+**Input:**
+```
+4
+0
+5
+2
+8
+3
+1
+12
+7
+3
+20
+4
+2
+```
+
+**Expected Output:**
+```
+Gantt Chart: P1 P2 P3 P4
+
+Process Arrival Burst Priority Completion Waiting Turnaround
+P1      0       5     2        5          0       5
+P2      8       3     1        11         0       3
+P3      12      7     3        19         0       7
+P4      20      4     2        24         0       4
+
+Average Waiting Time = 0
+Average Turnaround Time = 4.75
+```
+
+---
+
+## Notes About the Algorithm
+
+- The process with the lowest priority number runs first.
+- If two processes have the same priority, the process with the earlier arrival time runs first.
+- The algorithm is non-preemptive, so a running process cannot be interrupted.
+- If no process has arrived yet, the CPU stays idle and time increases by one unit.
+- The Gantt Chart shows the execution order of processes.
+- The final table is printed in process number order.
+
+---
+
+## Starvation
+
+Priority Scheduling can cause starvation.  
+This means that low-priority processes may wait for a long time if higher-priority processes keep arriving.
+
+In this program, all entered processes eventually execute because the number of processes is fixed.  
+However, in a real operating system where new processes may continuously arrive, starvation can happen.
+
+A common solution is **aging**, where the priority of a waiting process gradually improves over time.
 
 ---
 
 ## References
 
-1. Silberschatz, A., Galvin, P., & Gagne, G. (2018). *Operating System Concepts* (10th ed.). Wiley.
-2. [Priority Scheduling](https://en.wikipedia.org/wiki/Scheduling_(computing)#Priority_scheduling)
-
----
-
-## Notes
-
-- Clearly document your priority scheme (1 = highest or 10 = highest)
-- Discuss starvation problems and potential solutions (aging)
-- Include test cases that demonstrate priority-based scheduling behavior
-- Compare results with FCFS and SJF algorithms
-- Add comprehensive code comments
+- Silberschatz, A., Galvin, P., & Gagne, G. (2018). *Operating System Concepts* (10th ed.). Wiley.
+- Priority scheduling – Wikipedia
